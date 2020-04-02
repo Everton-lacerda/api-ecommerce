@@ -1,6 +1,6 @@
 const mongoose = require('mongoose')
 const User = mongoose.model('User')
-const sendRecoveryEmail = require('../helpers/email-recovery')
+// const sendRecoveryEmail = require('../helpers/email-recovery')
 
 class UserController {
     index(req, res, next) {
@@ -77,7 +77,7 @@ class UserController {
     }
 
     showRecovery(req, res, next) {
-        return res.render('recovery', { erros: null, success: null })
+        return res.render('./recovery', { erros: null, success: null })
     }
 
     createRecovery(req, res, next) {
@@ -121,3 +121,6 @@ class UserController {
 
     }
 }
+
+
+module.exports = UserController

@@ -1,4 +1,4 @@
-const {mongoose, Schema} = require('mongoose')
+const {mongoose, Schema, model} = require('mongoose')
 const uniqueValidator = require('mongoose-unique-validator')
 const crypto = require('crypto')
 const jwt = require('jsonwebtoken')
@@ -84,7 +84,7 @@ UserSchema.method.generateRecoveryPassword = function() {
 }
 
 UserSchema.method.clearTokenRecoveryPassword = function() {
-    this.recovery = {token = null, date: null}
+    this.recovery = {token: null, date: null}
     return this.recovery
 }
 
