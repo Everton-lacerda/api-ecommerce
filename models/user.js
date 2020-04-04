@@ -20,14 +20,15 @@ const UserSchema = new Schema({
     },
     store: {
         type: Schema.Types.ObjectId,
-        ref: 'Store'
+        ref: 'Store',
+        required: [true,"não pode ficar vazia."]
     },
     permission: {
         type: Array,
         default: ['client']
     },
-    hash: String,
-    salt: String,
+    hash: { type: String },
+    salt: { type: String },
     recovery: {
         type: {
             token: String,
@@ -42,20 +43,20 @@ const UserSchema = new Schema({
 
 UserSchema.plugin(uniqueValidator, {message: 'Email já esta sendo utilizado'})
 
-UserSchema.method.setPassword = function(password) {
+UserSchema.methods.setPassword = function(password) {
     this.salt = crypto.randomBytes(16).toString('hex')
     this.hash = crypto.pbkdf2Sync(password, this.salt,  1000, 512, 'sha512').toString('hex')
 }
 
-UserSchema.method.validatorPassword = function(password) {
+UserSchema.methods.validatorPassword = function(password) {
     const hash = crypto.pbkdf2Sync(password, this.salt,  1000, 512, 'sha512').toString('hex')
     return hash === this.hash
 }
 
-UserSchema.method.generateToken = function() {
-    const today = new Date();
+UserSchema.methods.generateToken = function() {
+    const today = new Date()
     const exp = new Date(today)
-    exp.setDate(today.getDate() = 15)
+    exp.setDate(today.getDate() + 15)
 
     return jwt.sign({
         id: this._id,
@@ -66,8 +67,9 @@ UserSchema.method.generateToken = function() {
 
 }
 
-UserSchema.method.sendToken = function() {
+UserSchema.methods.sendToken = function() {
     return {
+        _id: this._id,
         email: this.email,
         name: this.name,
         store: this.store,
@@ -76,14 +78,14 @@ UserSchema.method.sendToken = function() {
     }
 }
 
-UserSchema.method.generateRecoveryPassword = function() {
+UserSchema.methods.generateRecoveryPassword = function() {
     this.recovery = {}
     this.recovery = crypto.randomBytes(16).toString('hex')
     this.recovery.date = new Date( new Date().getTime() + 24*60*60*1000 )
     return this.recovery
 }
 
-UserSchema.method.clearTokenRecoveryPassword = function() {
+UserSchema.methods.clearTokenRecoveryPassword = function() {
     this.recovery = {token: null, date: null}
     return this.recovery
 }

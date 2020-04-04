@@ -1,23 +1,20 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <% include ('../partial/header') %>
+    <%- include ('../partials/header'); -%>
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
 
 </head>
 <body>
-    <div class="container bg-recovery ">
-        <div class="row">
-            <div class="col-sm-6 ">
-                <h2>Recuperar senha</h2>
+    <div class="container-fluid bg-recovery ">
+        <div class="row ">
+            <div class="col-sm-12">
+                <h2 class="text-center pb-3">Recuperar senha</h2>
                 <hr><br />
 
                 <% if(success){ %> 
                     <div class="alert alert-success">
                         <%= success %> 
-                    </div>
-                    <div class="text-center">
-                        <h3>Agora pode fazer seu login novamente :)</h3>
                     </div>
                 <% } %> 
 
@@ -27,19 +24,14 @@
                     </div>
                 <% } %> 
 
-                <% if(!success) { %> 
-                    <p>Digite aqui sua nova senha</p>
+                <p>Digite seu email para receber as instruções de recuperação de senha</p>
 
-                    <form action="/v1/api/users/newPassword" method="POST">
-                        <input type="hidden" name="token" value="<%= token  %> ">
-
-                        <div class="form-group">
-                            <input type="password" name="password" class="form-control" placeholder="Digite sua nova senha">
-                        </div>
-                        <button class="btn btn-primary">Criar nova senha</button>
-                    </form>
-                <% } %> 
-                 
+                <form action="/v1/api/users/passwordRecovery" method="POST">
+                    <div class="form-group">
+                        <input type="email" name="email" class="form-control" placeholder="Digite seu email">
+                    </div>
+                    <button class="btn btn-primary">Recuperar Senha</button>
+                </form>
             </div>
         </div>
     </div>

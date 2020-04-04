@@ -1,5 +1,5 @@
 {
-    "dbTest": "mongodb://localhost:27017/ecommerce-api-teste",
+    "dbTest": "mongodb+srv://usuario_admin:everton3b@cluster0-lqciw.mongodb.net/ecommerce-api-teste?retryWrites=true&w=majority",
     "dbProduction": "mongodb://localhost:27017/ecommerce-api"
 
     

@@ -1,17 +1,18 @@
 const mongoose = require('mongoose')
 const User = mongoose.model('User')
-// const sendRecoveryEmail = require('../helpers/email-recovery')
+const sendRecoveryEmail = require('../helpers/emailRecovery')
 
 class UserController {
     index(req, res, next) {
         User.findById(req.payload.id).then(user => {
             if (!user) return res.status(401).json({ erros: "Usuário não registrado" })
             return res.json({ user: user.sendToken() })
-        }).catch(next)
+        })
     }
 
     show(req, res, next) {
-        User.findById(req.params.id).populate({ path: 'store' })
+        User.findById(req.params.id)
+        // .populate({ path: 'store' })
             .then(user => {
                 if (!user) return res.status(401).json({ erros: "Usuário não registrado" })
                 return res.json({
@@ -28,14 +29,20 @@ class UserController {
 
     store(req, res, next) {
 
-        const { name, email, password } = req.body
+        const { name, email, password, store} = req.body
 
-        if(!name || !email || !password) return res.status(422).json({ erros: "Preencha todos os campos de cadastro" })
+        if(!name || !email || !password || !store) return res.status(422).json({ erros: "Preencha todos os campos de cadastro" })
 
-        const user = new User({ name, email })
+        const user = new User({ name, email, store })
         user.setPassword(password)
 
-        User.save().then(() => { return res.json({ user: user.sendToken() }) }).catch(next)
+        user.save()
+            // console.log('teste')
+            .then(() => res.json({ user: user.sendToken() }) )
+            .catch((err) => {
+                console.log(err)
+                next(err)
+        })
     }
 
     update(req, res, next) {
@@ -48,13 +55,13 @@ class UserController {
             if (typeof email !== 'undefined') user.name = email
             if (typeof password !== 'undefined') user.setPassword(password)
 
-            User.save().then(() => { return res.json({ user: user.sendToken() }) }).catch(next)
+            user.save().then(() =>  res.json({ user: user.sendToken() }) ).catch(next)
 
         }).catch(next)
     }
 
     remove(req, res, next) {
-        user.findById(req.payload.id).then(user => {
+        User.findById(req.payload.id).then(user => {
             if (!user) return res.status(401).json({ erros: "Usuário não registrado" })
             return user.remove().then(() => {
                 return res.json({ remove: true })
@@ -76,8 +83,8 @@ class UserController {
         }).catch(next)
     }
 
-    showRecovery(req, res, next) {
-        return res.render('./recovery', { erros: null, success: null })
+    showRecovery(req, res, next){
+        return res.render('recovery/teste', { error: null, success: null });
     }
 
     createRecovery(req, res, next) {
@@ -88,7 +95,9 @@ class UserController {
             if (!user) return res.render('recovery', { error: "Nenhum usuario com esta email", success: null })
             const recoveryData = user.create.generateRecoveryPassword()
             return user.save().then(() => {
-                return res.render('recovery', { error: null, success: true })
+                sendRecoveryEmail({ user, recovery: recoveryData }, (error = null, success = null) =>{
+                    return res.render("recovery", { error, success })
+                })
             }).catch(next)
         }).catch(next)
     }
